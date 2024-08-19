@@ -34,8 +34,6 @@ const fullLevel: Map<TLogLevel, string> = new Map([
 	['warn', '[WARNING]: '],
 ]);
 
-const PRIMITIVE_TYPES = new Set(['number', 'string', 'boolean', 'symbol', 'undefined']);
-
 export default class TEXT {
 	private $_getTime: (date: Date) => string = () => '';
 	private $_getLevel: (level: TLogLevel) => string = () => '';

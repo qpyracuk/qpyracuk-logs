@@ -404,6 +404,11 @@ export default class FileManager {
 	}
 
 	private async ensureWriteStreamOpen() {
+		const isDirectoryExists = await exists(this.outDir);
+		if (!isDirectoryExists) {
+			await mkdir(this.outDir);
+			this.log(`Created output directory: ${this.outDir}`);
+		}
 		if (!this.currentWriteStream || !this.currentWriteStream.isStreamOpen()) {
 			this.log('Stream is not open, attempting to reopen.');
 			if (this.enableRotation) {
