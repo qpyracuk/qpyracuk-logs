@@ -225,7 +225,7 @@ export default class Producer extends EventEmitter {
 		const time = pretty.time ? `${getFullTime(new Date())} ` : '';
 		const title = pretty.title || '';
 
-		return `${dye({ s: 'bold', f: levelToColor(level) })}${emoji}: ${time}${title}\n${String(message)} ${String(optionalParams.join(' '))}${dye()}`;
+		return `${dye({ s: 'bold', f: levelToColor(level) })}${emoji} ${time}${title}\n${dye() + dye({ f: levelToColor(level) })}${String(message)} ${String(optionalParams.join(' '))}${dye()}`;
 	}
 
 	/**
