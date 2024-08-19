@@ -1,0 +1,64 @@
+{
+	"name": "@qpyracuk/logs",
+	"version": "0.0.1",
+	"description": "Fast async logs for node.js.",
+	"author": "Pobedinskiy David (qpyracuk)",
+	"type": "commonjs",
+	"license": "Apache-2.0",
+	"keywords": [
+		"logs",
+		"async-logs",
+		"nodejs-logs"
+	],
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/qpyracuk/Fylo.git"
+	},
+	"bugs": {
+		"url": "https://github.com/qpyracuk/Fylo/issues"
+	},
+	"homepage": "https://github.com/qpyracuk/Fylo#readme",
+	"scripts": {
+		"dev": "tsup ./src/index.ts --watch --onSuccess \"node ./dist/index.js\"",
+		"start": "node ./dist/index.js",
+		"build": "tsup",
+		"lint": "eslint ./src --no-cache",
+		"lint:fix": "eslint \"**/*.{ts,tsx}\" --fix --color",
+		"format": "prettier --write \"**/*.{js,ts,.md}\"",
+		"prepare": "npm run build"
+	},
+	"dependencies": {
+		"@qpyracuk/mkdirp-es2017": "^0.1.1",
+		"@qpyracuk/xml-builder": "^0.1.2",
+		"fylo": "^0.0.3",
+		"node-cron": "^3.0.3"
+	},
+	"peerDependencies": {
+		"@qpyracuk/mkdirp-es2017": "^0.1.1",
+		"@qpyracuk/xml-builder": "^0.1.2"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.9.0",
+		"@swc/core": "^1.7.11",
+		"@swc/helpers": "^0.5.12",
+		"@types/eslint-config-prettier": "^6.11.3",
+		"@types/node": "^22.4.0",
+		"@types/node-cron": "^3.0.11",
+		"@typescript-eslint/eslint-plugin": "^8.1.0",
+		"@typescript-eslint/parser": "^8.1.0",
+		"eslint": "^9.9.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-prettier": "^5.2.1",
+		"prettier": "^3.3.3",
+		"tsup": "^8.2.4",
+		"typescript": "^5.5.4"
+	}
+}
