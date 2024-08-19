@@ -1,6 +1,6 @@
 {
 	"name": "@qpyracuk/logs",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Fast async logs for node.js.",
 	"author": "Pobedinskiy David (qpyracuk)",
 	"type": "commonjs",
