@@ -257,7 +257,7 @@ export default class Producer extends EventEmitter {
 	private initializeLevelFlags(levels?: TCreateLogLevel | TCreateLogLevel[]): ILogLevelFlags {
 		if (!levels || levels === '*') return createLogLevelFlags(true);
 		const exactlyArray = Array.isArray(levels) ? levels : [levels];
-		if (exactlyArray.includes('*')) return createLogLevelFlags(false);
+		if (exactlyArray.includes('*')) return createLogLevelFlags(true);
 		const levelFlags = createLogLevelFlags(false);
 		for (const level of exactlyArray as TLogLevel[]) levelFlags[level] = LOG_LEVEL.has(level);
 		return levelFlags;

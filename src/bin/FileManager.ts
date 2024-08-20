@@ -37,6 +37,7 @@ export default class FileManager {
 	private bufferSize: number = 0;
 	private readonly MAX_BUFFER_SIZE = 2 * 1024 * 1024;
 	private lastResetDate: string = '';
+	private isInitialized: boolean = false;
 
 	constructor(
 		outDir: string,
@@ -52,10 +53,6 @@ export default class FileManager {
 		archivingSchedule: string = '0 0 * * *',
 		debug: boolean = false,
 	) {
-		if (lifetime <= archiveVia) {
-			throw new Error('File lifetime must be greater than archive duration.');
-		}
-
 		this.outDir = outDir;
 		this.pattern = ensureChunkAndHashInPattern(pattern || 'log-{YYYY}-{MM}-{DD}_{hh}-{mm}-{ss}.log');
 		this.maxFileSize = maxFileSize;
@@ -330,8 +327,12 @@ export default class FileManager {
 		try {
 			const isDirectoryExists = await exists(this.outDir);
 			if (!isDirectoryExists) {
-				await mkdir(this.outDir);
-				this.log(`Created output directory: ${this.outDir}`);
+				try {
+					await mkdir(this.outDir);
+					this.log(`Created output directory: ${this.outDir}`);
+				} catch {
+					this.log(`Failed to create directory: ${this.outDir}`);
+				}
 			}
 
 			await this.cleanupOldFiles();
@@ -343,7 +344,7 @@ export default class FileManager {
 				const latestFile = this.findLatestLiveFile(liveFiles, fileStatsMap);
 				if (latestFile) {
 					this.currentWriteStream = new WriteStream(latestFile);
-					await this.currentWriteStream.open({ encoding: 'utf-8' });
+					await this.currentWriteStream.open({ encoding: 'utf-8', flags: 'a' });
 					this.log(`Continuing to write to existing file: ${latestFile}`);
 
 					const stats = await stat(latestFile);
@@ -351,22 +352,23 @@ export default class FileManager {
 					this.log(`Initialized current file size to ${this.currentFileSize} bytes.`);
 
 					await this.flushBuffer();
+					this.isInitialized = true;
 					return;
 				}
-			}
-
-			await this.createNewFile(1);
+			} else await this.createNewWriteStream(1);
+			this.isInitialized = true;
 		} catch (error) {
 			this.log(`Error during write stream initialization: ${(error as Error).message}`);
+			this.isInitialized = true;
 		}
 	}
 
-	private async createNewFile(chunkNumber: number) {
+	private async createNewWriteStream(chunkNumber: number) {
 		try {
 			const newFileName = generateFilePath(this.outDir, this.pattern, chunkNumber);
 			this.currentWriteStream = new WriteStream(newFileName);
 
-			await this.currentWriteStream.open({ encoding: 'utf-8' });
+			await this.currentWriteStream.open({ encoding: 'utf-8', flags: 'a' });
 			this.currentFileSize = 0;
 			this.log(`Created and writing to new file: ${newFileName}`);
 
@@ -378,6 +380,10 @@ export default class FileManager {
 	}
 
 	async write(data: Buffer) {
+		if (!this.isInitialized) {
+			this.bufferData(data);
+			return;
+		}
 		try {
 			if (!this.currentWriteStream || !this.currentWriteStream.isStreamOpen()) {
 				this.log('Stream is not open, buffering data.');
@@ -434,7 +440,7 @@ export default class FileManager {
 				this.log('Closed current write stream');
 			}
 
-			await this.createNewFile(latestChunk + 1);
+			await this.createNewWriteStream(latestChunk + 1);
 			this.log('Rotated to new write stream');
 		} catch (error) {
 			this.log(`Failed during rotation, buffering further writes: ${(error as Error).message}`);
